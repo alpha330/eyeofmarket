@@ -1,0 +1,11 @@
+from django.urls import path, include
+from accounts import views
+# FROM WEBSITE URLS CONFIG core.urls<---->webiste.urs
+
+app_name = "accounts"
+
+urlpatterns = [
+    path('login/',views.LoginView.as_view(),name='login'),
+    # path('register/',views.LoginView.as_view(),name='register'),
+    path('logout/',views.LogoutView.as_view(),name='logout'),
+]
