@@ -1,16 +1,22 @@
 version : "2"
 
 services:
-    redis_emarket:
-      container_name: redis_emarket  
+    redis-emarket:
+      container_name: redis-emarket  
+      build: 
+        context: .
+        dockerfile: ./dockerfiles/dev/django/Dockerfile
       image: redis
       restart: always
       ports:
-      - "6380:6380"
+        - "6379:6379"
       command : redis-server --save 60 1 --loglevel warning
 
     DB:
       container_name : DataBase
+      build: 
+        context: .
+        dockerfile: ./dockerfiles/dev/django/Dockerfile
       image : postgres:15-alpine
       volumes :
         - ./postgres/data:/var/lib/postgresql/data
@@ -38,13 +44,15 @@ services:
       restart: always
       depends_on:
        - DB
-       - redis_emarket
+       - redis-emarket
 
-    worker_celety:
-      build: .
+    worker_emarket_celery:
+      build: 
+        context: .
+        dockerfile: ./dockerfiles/dev/django/Dockerfile
       command: celery -A core worker --loglevel=info
       depends_on:
-        - redis_emarket
+        - redis-emarket
         - backend-server
 
     smtp4dev:
