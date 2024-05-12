@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, Ht
 from django.urls import reverse_lazy, reverse
 from django.views.generic import View
 from django.contrib.auth import views as auth_views
-from accounts.forms import AuthenticationForm, ResetLinkEmailPassword, PasswordResetForm
+from accounts.forms import AuthenticationForm, ResetLinkEmailPasswordForm, PasswordResetForm
 from django.core.exceptions import ValidationError
 import jwt
 from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
@@ -30,11 +30,11 @@ class ForgetPasswordLinkView(View):
     template_name = 'accounts/forget-password.html'
 
     def get(self, request):
-        form = ResetLinkEmailPassword()
+        form = ResetLinkEmailPasswordForm()
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        form = ResetLinkEmailPassword(request.POST)
+        form = ResetLinkEmailPasswordForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             user_obj = get_object_or_404(User, email=email)

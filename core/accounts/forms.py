@@ -1,12 +1,12 @@
 from django.contrib.auth import forms as auth_form
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django import forms
 # FORMS TO MANAGE SOME VIEWS AND ACT OF USERS IN accounts APP accounts.forms<---->accounts.views
 
-User=get_user_model()
+User = get_user_model()
+
 
 class AuthenticationForm(auth_form.AuthenticationForm):
 
@@ -25,12 +25,13 @@ class ResetLinkEmailPasswordForm(forms.Form):
             user_obj = User.objects.get(email=email)
         except User.DoesNotExist:
             raise forms.ValidationError(_('ایمیل موجود نیست'))
-        
+
         if not user_obj.is_active:
             raise forms.ValidationError(_('حساب کاربری غیرفعال است'))
 
         return email
-    
+
+
 class PasswordResetForm(forms.Form):
     password = forms.CharField(
         label=_('Password'),
@@ -46,7 +47,8 @@ class PasswordResetForm(forms.Form):
     def clean_password1(self):
         password = self.cleaned_data.get('password')
         if len(password) < 8:
-            raise forms.ValidationError(_('رمز عبور باید حداقل 8 کاراکتر داشته باشد.'))
+            raise forms.ValidationError(
+                _('رمز عبور باید حداقل 8 کاراکتر داشته باشد.'))
         return password
 
     def clean_password2(self):
@@ -54,6 +56,7 @@ class PasswordResetForm(forms.Form):
         password2 = self.cleaned_data.get('password2')
 
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError(_('رمز عبور عبور و تکرار رمز عبور یکسان نیست.'))
-        
+            raise forms.ValidationError(
+                _('رمز عبور عبور و تکرار رمز عبور یکسان نیست.'))
+
         return password2
