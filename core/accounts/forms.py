@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django import forms
+import re
 # FORMS TO MANAGE SOME VIEWS AND ACT OF USERS IN accounts APP accounts.forms<---->accounts.views
 
 User = get_user_model()
@@ -46,9 +47,24 @@ class PasswordResetForm(forms.Form):
 
     def clean_password1(self):
         password = self.cleaned_data.get('password')
-        if len(password) < 8:
+        if password is None or len(password) < 8:
             raise forms.ValidationError(
                 _('رمز عبور باید حداقل 8 کاراکتر داشته باشد.'))
+        if not re.search(r'[A-Z]', password):
+            raise forms.ValidationError(
+                _('رمز عبور باید حداقل یک حرف بزرگ داشته باشد.'))
+        
+        if not re.search(r'[a-z]', password):
+            raise forms.ValidationError(
+                _('رمز عبور باید حداقل یک حرف کوچک داشته باشد.'))
+
+        if not re.search(r'\d', password):
+            raise forms.ValidationError(
+                _('رمز عبور باید حداقل یک عدد داشته باشد.'))
+
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            raise forms.ValidationError(
+                _('رمز عبور باید حداقل یک علامت ویژه داشته باشد.'))
         return password
 
     def clean_password2(self):
