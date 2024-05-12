@@ -24,3 +24,18 @@ class ResetLinkEmailPassword(forms.Form):
         except User.DoesNotExist:
             raise forms.ValidationError('ایمیل موجود نیست')
         return email
+    
+class PasswordResetForm(forms.Form):
+    
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Repeat Password', widget=forms.PasswordInput)
+    
+    def clean(self):
+        new_password = super().clean()
+        password = new_password.get("password")
+        password1 = new_password.get("password1")
+
+        if password and password1 and password != password1:
+            raise forms.ValidationError("رمز عبور عبور و تکرار رمز عبور یکسان نیست")
+        
+        return new_password
