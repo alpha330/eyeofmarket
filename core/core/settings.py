@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'mail_templated',
     'accounts',
     'website',
+    'shop',
 ]
 
 MIDDLEWARE = [
