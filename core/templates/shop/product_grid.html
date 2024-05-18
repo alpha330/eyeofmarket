@@ -203,7 +203,7 @@
 
                             <h4 class="card-title">
                                 <a class="text-dark"
-                                    href="#">{{object.title}}</a>
+                                    href="{% url 'shop:product-detail' slug=object.slug %}">{{object.title}}</a>
                             </h4>
                             {% if object.is_discounted %}
                             <p class="card-text text-dark fs-4">
