@@ -1,5 +1,7 @@
 {% load static%}
 {% load static %}
+
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
@@ -315,7 +317,7 @@
 
                     <div class="mb-7">
                         <!-- Form -->
-                        <form>
+                        <form action="{% url 'shop:product-grid' %}" >
                             <!-- Input Card -->
                             <div class="input-card">
                                 <div class="input-card-form">
@@ -334,7 +336,6 @@
             </div>
         </div>
     </div>
-
     <!-- Offcanvas Search -->
     <div class="offcanvas offcanvas-end " tabindex="-1" id="offcanvasNavbarShoppingCart">
         <div class="offcanvas-header justify-content-between border-0 pb-0 ">
