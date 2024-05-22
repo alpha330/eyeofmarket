@@ -129,6 +129,76 @@
                 <!-- Form -->
                 <form action="{% url 'website:contact' %}" method="post">
                     {% csrf_token %}
+                    {% if request.user.is_authenticated %}
+                    <div class="row gx-3">
+                        <div class="col-sm-12">
+                            <!-- Form -->        
+                            <div class="mb-3">
+                                <input hidden="true" type="text" class="form-control form-control-lg" name="first_name"
+                                    id="formFirstName" placeholder="نام " value={{profile.first_name}} required>
+                            </div>
+                            <!-- End Form -->
+                        </div>
+                        <!-- End Col -->
+
+                        <div class="col-sm-12">
+                            <!-- Form -->
+                            <div class="mb-3">
+                                <input hidden="true" type="text" class="form-control form-control-lg" name="last_name"
+                                    id="formFirstName" placeholder="نام و نام خانوادگی" value={{profile.last_name}} required>
+                            </div>
+                            <!-- End Form -->
+                        </div>
+                        <!-- End Col -->
+
+                   
+                    </div>
+                    <!-- End Row -->
+
+                    <div class="row gx-3">
+                        <div class="col-sm-6">
+                            <!-- Form -->
+                            <div class="mb-3">
+                                <input hidden="true" type="email" class="form-control form-control-lg " name="email_address" dir="ltr"
+                                    id="formEmail" placeholder="email@site.com" aria-label="email@site.com" value={{request.user.email}} required>
+                            </div>
+                            <!-- End Form -->
+                        </div>
+                        <!-- End Col -->
+
+                        <div class="col-sm-6">
+                            <!-- Form -->
+                            <div class="mb-3">
+                                <input hidden="true" type="text" class="form-control form-control-lg " name="mobile_number" value="{{profile.phone_number}}" dir="ltr"
+                                    id="formPhoneNumber" placeholder="+9891200000" required>
+                            </div>
+                            <!-- End Form -->
+                        </div>
+                        <!-- End Col -->
+                    </div>
+                    <!-- End Row -->
+                    <div class="row gx-3">
+                        <div class="col-sm-12">
+                            <!-- Form -->
+                            <div class="mb-3">
+                                <label class="form-label" for="formSubject">موضوع</label>
+                                <input type="text" class="form-control form-control-lg" name="subject"
+                                    id="formSubject" placeholder="موضوع مورد نظر را وارد نمایید" aria-label="First name" required>
+                            </div>
+                            <!-- End Form -->
+                        </div>
+                        <!-- End Col -->
+
+                   
+                    </div>
+                    <!-- Form -->
+                    <div class="mb-3">
+                        <label class="form-label" for="formDescription">توضیحات</label>
+                        <textarea class="form-control form-control-lg" name="message"
+                            id="formDescription" placeholder="توضیحات خود را وارد نمایید"
+                            aria-label="Tell us about your ..." rows="4" required></textarea>
+                    </div>
+                    {% else %}
                     <div class="row gx-3">
                         <div class="col-sm-12">
                             <!-- Form -->
@@ -202,6 +272,7 @@
                             aria-label="Tell us about your ..." rows="4" required></textarea>
                     </div>
                     <!-- End Form -->
+                    {% endif %}
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">ارسال درخواست</button>

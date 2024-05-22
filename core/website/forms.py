@@ -1,5 +1,5 @@
 from django import forms
-from website.models import TicketingFormModel
+from website.models import TicketingFormModel,NewsLetterModel
 
 class TicketForm(forms.ModelForm):
     
@@ -12,4 +12,12 @@ class TicketForm(forms.ModelForm):
             'mobile_number',
             'subject',
             'message',       
+        ]
+        
+class NewsLetterForm(forms.ModelForm):
+    
+    class Meta:
+        model = NewsLetterModel
+        fields = [
+            "email",
         ]

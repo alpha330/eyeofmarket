@@ -13,4 +13,11 @@ class TicketingFormModel(models.Model):
     
     def __str__(self):
         
-        return self.email_address 
+        return self.email_address
+    
+class NewsLetterModel(models.Model):
+    email = models.EmailField(help_text="ایمیل عضویت در خبر نامه")
+    created_at = models.DateTimeField(auto_now=True,help_text="تاریخ  عضویت")
+    
+    def __str__(self):
+        return self.email
