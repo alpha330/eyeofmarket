@@ -13,6 +13,7 @@ from accounts.tasks import sendEmail
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from accounts.models import Profile
+from cart.cart import CartSession
 # Create your views here.
 
 User = get_user_model()
@@ -22,6 +23,13 @@ class LoginView(auth_views.LoginView):
     template_name = "accounts/login.html"
     form_class = AuthenticationForm
     redirect_authenticated_user = True
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        # بعد از ورود موفقیت‌آمیز کاربر، سبد خرید session را به پایگاه داده منتقل کنید
+        cart = CartSession(self.request.session)
+        cart.sync_cart_items_from_db(self.request.user)
+        return response
 
 
 class LogoutView(auth_views.LogoutView):
