@@ -10,19 +10,16 @@ class CartSession:
         for item in self._cart["items"]:
             if product_id == item["product_id"]:
                 item["quantity"] = int(quantity)
+                self.save()
                 break
-        else:
-            return
-        self.save()
     
     def remove_product(self,product_id):
         for item in self._cart["items"]:
             if product_id == item["product_id"]:
                 self._cart["items"].remove(item)
+                self.save()
                 break
-        else:
-            return
-        self.save()
+        
         
     def add_product(self, product_id):
         for item in self._cart["items"]:
@@ -58,10 +55,13 @@ class CartSession:
         self.session.modified = True
 
 
-    def sync_cart_items_from_db(self,user):
-        cart,created = CartModel.objects.get_or_create(user=user)
-        cart_items = CartItemModel.objects.filter(cart=cart)
+    def sync_cart_items_from_db(self, user):
+        if not user.is_authenticated:
+            return
         
+        cart, created = CartModel.objects.get_or_create(user=user)
+        cart_items = CartItemModel.objects.filter(cart=cart)
+
         for cart_item in cart_items:
             for item in self._cart["items"]:
                 if str(cart_item.product.id) == item["product_id"]:
@@ -75,16 +75,19 @@ class CartSession:
         self.save()
             
         
-    def merge_session_cart_in_db(self,user):
-        cart,created = CartModel.objects.get_or_create(user=user)
+    def merge_session_cart_in_db(self, user):
+        if not user.is_authenticated:
+            return
         
-        for item in  self._cart["items"]:
+        cart, created = CartModel.objects.get_or_create(user=user)
+        
+        for item in self._cart["items"]:
             product_obj = ProductModel.objects.get(id=item["product_id"], status=ProductStatusType.publish.value)
-            
-            cart_item ,created = CartItemModel.objects.get_or_create(cart=cart,product=product_obj)
+            cart_item, created = CartItemModel.objects.get_or_create(cart=cart, product=product_obj)
             cart_item.quantity = item["quantity"]
             cart_item.save()
-        session_product_ids = [item["product_id"] for item in  self._cart["items"]]
+        
+        session_product_ids = [item["product_id"] for item in self._cart["items"]]
         CartItemModel.objects.filter(cart=cart).exclude(product__id__in=session_product_ids).delete()
         
 
