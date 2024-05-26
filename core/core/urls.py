@@ -27,6 +27,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('cart/',include("cart.urls")),
     path('shop/', include('shop.urls')),
+    path('dashboard/',include("dashboard.urls"))
 ]
 
 # patterns for dispatch statis
