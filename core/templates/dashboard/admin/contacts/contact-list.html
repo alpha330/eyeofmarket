@@ -44,8 +44,8 @@
             <div class="col-md-3 py-1">
                 <select class="form-select form-select-sm" id="order-by-filter">
                     <option value="" selected>مرتب سازی</option>
-                    <option value="-created_date">جدیدترین</option>
-                    <option value="created_date">قدیمی ترین</option>
+                    <option value="-created_at">جدیدترین</option>
+                    <option value="created_at">قدیمی ترین</option>
                 </select>
             </div>
 
@@ -104,11 +104,11 @@
                                 {% for object in object_list %}
                                 <tr>
                                     <th scope="row">{{forloop.counter}}</th>
-                                    <td>{{object.full_name}}</td>
-                                    <td>{{object.email}}</td>
-                                    <td>{{object.phone_number}}</td>
+                                    <td>{{object.first_name}} {{object.last_name}}</td>
+                                    <td>{{object.email_address}}</td>
+                                    <td>{{object.email_address}}</td>
                                     <td>{{object.subject}}</td>
-                                    <td>{{object.created_date|date:"Y-m-d h:i"}}</td>
+                                    <td>{{object.created_at|date:"Y-m-d h:i"}}</td>
                                     <td>
                                         {% if object.is_seen %}
                                         <span class="badge bg-success">دیده شده</span>

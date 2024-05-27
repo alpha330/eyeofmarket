@@ -10,6 +10,7 @@ class TicketingFormModel(models.Model):
     subject = models.CharField(max_length=255,help_text="موضوع")
     message = models.TextField(help_text="پیغام")
     created_at = models.DateTimeField(auto_now=True,help_text="تاریخ تولید پیغام")
+    is_seen = models.BooleanField(default=False)
     
     def __str__(self):
         
