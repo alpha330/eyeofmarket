@@ -1,7 +1,8 @@
 from django import forms
-from shop.models import ProductModel,ProductImageModel
-class ProductForm(forms.ModelForm):
+from shop.models import ProductModel, ProductImageModel
 
+
+class ProductForm(forms.ModelForm):
 
     class Meta:
         model = ProductModel
@@ -17,6 +18,7 @@ class ProductForm(forms.ModelForm):
             "price",
             "discount_percent",
         ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['title'].widget.attrs['class'] = 'form-control'
@@ -34,13 +36,12 @@ class ProductForm(forms.ModelForm):
 
 class ProductImageForm(forms.ModelForm):
 
-
     class Meta:
         model = ProductImageModel
         fields = [
             "file",
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['file'].widget.attrs['class'] = 'form-control'
