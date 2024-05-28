@@ -153,3 +153,7 @@ cython_debug/
 
 # database ignore directories and sub
 postgres/data/*
+
+# ignore media
+media/*
+
