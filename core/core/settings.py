@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'mail_templated',
     'dashboard',
+    'order',
     'accounts',
     'website',
     'shop',
