@@ -26,9 +26,6 @@ class LoginView(auth_views.LoginView):
     
     def form_valid(self, form):
         response = super().form_valid(form)
-        # بعد از ورود موفقیت‌آمیز کاربر، سبد خرید session را به پایگاه داده منتقل کنید
-        cart = CartSession(self.request.session)
-        cart.sync_cart_items_from_db(self.request.user)
         return response
 
 
