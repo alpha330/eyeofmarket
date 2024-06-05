@@ -47,7 +47,7 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         total_price = order.calculate_total_price()
         self.apply_coupon(coupon, order, user, total_price)
         order.save()
-        return redirect(self.create_payment_url(order))
+        return redirect('order:completed')
 
     # def create_payment_url(self, order):
     #     zarinpal = ZarinPalSandbox()
