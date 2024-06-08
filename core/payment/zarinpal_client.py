@@ -1,6 +1,6 @@
 # import requests
 # import json
-# from django.conf import settings
+from django.conf import settings
 # from django.contrib.sites.models import Site
 
 # def get_domain():
@@ -60,7 +60,7 @@ class ZarinPalSandbox:
     _payment_page_url = "https://sandbox.zarinpal.com/pg/StartPay/"
     _callback_url = "http://redreseller.com/verify"
 
-    def __init__(self, merchant_id):
+    def __init__(self, merchant_id=settings.MERCHANT_ID):
         self.merchant_id = merchant_id
 
     def payment_request(self, amount, description="پرداختی کاربر"):
