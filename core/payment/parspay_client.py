@@ -1,0 +1,113 @@
+# import requests
+# import json
+from django.conf import settings
+# from django.contrib.sites.models import Site
+
+# def get_domain():
+#     return Site.objects.get_current().domain
+# def get_protocol():
+#     # Determine the protocol based on the SECURE_SSL_REDIRECT setting
+#     return'https' if getattr(settings, 'SECURE_SSL_REDIRECT', False) else 'http'
+
+# class ZarinPalSandbox:
+#     _payment_request_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
+#     _payment_verify_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
+#     _payment_page_url = "https://sandbox.zarinpal.com/pg/StartPay/"
+#     _callback_url = f"{get_protocol()}://{get_domain()}/payment/verify"
+
+#     def __init__(self, merchant_id=settings.MERCHANT_ID):
+#         self.merchant_id = merchant_id
+
+#     def payment_request(self, amount, description="پرداختی کاربر"):
+#         payload = {
+#             "MerchantID": self.merchant_id,
+#             "Amount": str(amount),
+#             "CallbackURL": self._callback_url,
+#             "Description": description,
+#         }
+#         headers = {
+#             'Content-Type': 'application/json'
+#         }
+
+#         response = requests.post(
+#             self._payment_request_url, headers=headers, data=json.dumps(payload))
+
+#         return response.json()
+
+#     def payment_verify(self,amount,authority):
+#         payload = {
+#             "MerchantID": self.merchant_id,
+#             "Amount": amount,
+#             "Authority": authority
+#         }
+#         headers = {
+#             'Content-Type': 'application/json'
+#         }
+
+#         response = requests.post(self._payment_verify_url, headers=headers, data=json.dumps(payload))
+#         return response.json()
+
+#     def generate_payment_url(self,authority):
+#         return f"{self._payment_page_url}{authority}"
+
+import requests
+import json
+
+
+class ParsPaySandBox:
+    _payment_request_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
+    _payment_verify_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
+    _payment_page_url = "https://sandbox.zarinpal.com/pg/StartPay/"
+    _return_url = "http://127.0.0.1:8000/payment/verify"
+
+    def __init__(self, merchant_id=settings.MERCHANT_ID_PARSPAY):
+        self.merchant_id = merchant_id
+
+    def payment_request(self, amount, description="پرداختی کاربر"):
+        payload = {
+            "MerchantID": self.merchant_id,
+            "Amount": str(amount),
+            "return_url": self._return_url,
+            "Description": description,
+        }
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.post(
+            self._payment_request_url, headers=headers, data=json.dumps(payload))
+
+        return response.json()
+
+    def payment_verify(self,amount,authority):
+        payload = {
+            "MerchantID": self.merchant_id,
+            "Amount": amount,
+            "Authority": authority
+        }
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.post(self._payment_verify_url, headers=headers, data=json.dumps(payload))
+        return response.json()
+
+    def generate_payment_url(self,authority):
+        return self._payment_page_url + authority
+
+
+
+if __name__ == "__main__":
+    parspay = ParsPaySandBox(merchant_id="4ced0a1e-4ad8-4309-9668-3ea3ae8e8897")
+    response =parspay.payment_request(15000)
+    
+    print(response)
+    input("proceed to generating payment url?")
+    print(parspay.generate_payment_url(response["Authority"]))
+    
+    input("check the payment?")
+    
+    response = parspay.payment_verify(15000,response["Authority"])
+    print(response)
+    
+    
