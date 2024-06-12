@@ -5,6 +5,5 @@ app_name = "payment"
 
 urlpatterns = [
     path("verify",views.PaymentVerifyView.as_view(),name="verify"),
-
-
+    path("verify/parspay",views.PaymentVerifyParsPayView.as_view(),name="verify-parspay"),
 ]

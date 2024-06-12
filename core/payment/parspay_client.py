@@ -1,113 +1,79 @@
-# import requests
-# import json
-from django.conf import settings
-# from django.contrib.sites.models import Site
-
-# def get_domain():
-#     return Site.objects.get_current().domain
-# def get_protocol():
-#     # Determine the protocol based on the SECURE_SSL_REDIRECT setting
-#     return'https' if getattr(settings, 'SECURE_SSL_REDIRECT', False) else 'http'
-
-# class ZarinPalSandbox:
-#     _payment_request_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
-#     _payment_verify_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
-#     _payment_page_url = "https://sandbox.zarinpal.com/pg/StartPay/"
-#     _callback_url = f"{get_protocol()}://{get_domain()}/payment/verify"
-
-#     def __init__(self, merchant_id=settings.MERCHANT_ID):
-#         self.merchant_id = merchant_id
-
-#     def payment_request(self, amount, description="پرداختی کاربر"):
-#         payload = {
-#             "MerchantID": self.merchant_id,
-#             "Amount": str(amount),
-#             "CallbackURL": self._callback_url,
-#             "Description": description,
-#         }
-#         headers = {
-#             'Content-Type': 'application/json'
-#         }
-
-#         response = requests.post(
-#             self._payment_request_url, headers=headers, data=json.dumps(payload))
-
-#         return response.json()
-
-#     def payment_verify(self,amount,authority):
-#         payload = {
-#             "MerchantID": self.merchant_id,
-#             "Amount": amount,
-#             "Authority": authority
-#         }
-#         headers = {
-#             'Content-Type': 'application/json'
-#         }
-
-#         response = requests.post(self._payment_verify_url, headers=headers, data=json.dumps(payload))
-#         return response.json()
-
-#     def generate_payment_url(self,authority):
-#         return f"{self._payment_page_url}{authority}"
-
 import requests
 import json
 
-
 class ParsPaySandBox:
-    _payment_request_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
-    _payment_verify_url = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
-    _payment_page_url = "https://sandbox.zarinpal.com/pg/StartPay/"
-    _return_url = "http://127.0.0.1:8000/payment/verify"
+    _payment_request_url = "https://sandbox.api.parspal.com/v1/payment/request"
+    _payment_verify_url = "https://sandbox.api.parspal.com/v1/payment/verify"
+    _payment_page_url = "https://sandbox.api.parspal.com/v1/payment/redirect/"
+    _return_url = "http://127.0.0.1:8000/payment/verify/parspay"
 
-    def __init__(self, merchant_id=settings.MERCHANT_ID_PARSPAY):
-        self.merchant_id = merchant_id
+    def __init__(self, api_key):
+        self.api_key = api_key
 
-    def payment_request(self, amount, description="پرداختی کاربر"):
+    def payment_request(self, amount, description="پرداختی کاربر", currency=None, reserve_id=None, order_id=None, payer=None):
         payload = {
-            "MerchantID": self.merchant_id,
-            "Amount": str(amount),
+            "amount": amount,
             "return_url": self._return_url,
-            "Description": description,
+            "description": description,
+            "currency": currency,
+            "reserve_id": reserve_id,
+            "order_id": order_id,
+            "payer": payer
         }
         headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'APIKEY': self.api_key
         }
 
         response = requests.post(
             self._payment_request_url, headers=headers, data=json.dumps(payload))
 
-        return response.json()
+        result = response.json()
 
-    def payment_verify(self,amount,authority):
+        if response.status_code != 200 or result.get('status') != 'ACCEPTED':
+            error_message = result.get('message', 'Unknown error')
+            raise Exception(f"Error in payment request: {error_message}")
+
+        return result
+
+    def payment_verify(self, receipt_number, amount, currency=None):
         payload = {
-            "MerchantID": self.merchant_id,
-            "Amount": amount,
-            "Authority": authority
+            "amount": amount,
+            "receipt_number": receipt_number,
+            "currency": currency,
         }
         headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'APIKEY': self.api_key
         }
 
         response = requests.post(self._payment_verify_url, headers=headers, data=json.dumps(payload))
-        return response.json()
+        result = response.json()
 
-    def generate_payment_url(self,authority):
-        return self._payment_page_url + authority
+        if response.status_code != 200 or result.get('status') != 'SUCCESSFUL':
+            error_message = result.get('message', 'Unknown error')
+            raise Exception(f"Error in payment verification: {error_message}")
 
+        return result
 
+    def generate_payment_url(self, payment_id):
+        return self._payment_page_url + payment_id
 
+# Test the class
 if __name__ == "__main__":
-    parspay = ParsPaySandBox(merchant_id="4ced0a1e-4ad8-4309-9668-3ea3ae8e8897")
-    response =parspay.payment_request(15000)
-    
-    print(response)
-    input("proceed to generating payment url?")
-    print(parspay.generate_payment_url(response["Authority"]))
-    
-    input("check the payment?")
-    
-    response = parspay.payment_verify(15000,response["Authority"])
-    print(response)
-    
-    
+    api_key = "00000000aaaabbbbcccc000000000000"
+    parspay = ParsPaySandBox(api_key)
+
+    try:
+        response = parspay.payment_request(15000)
+        print(response)
+        payment_url = parspay.generate_payment_url(response["payment_id"])
+        print(f"Payment URL: {payment_url}")
+
+        input("Proceed to payment and press enter to verify...")
+
+        verification_response = parspay.payment_verify(response["payment_id"], 15000)
+        print(verification_response)
+
+    except Exception as e:
+        print(f"An error occurred: {e}")

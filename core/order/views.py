@@ -19,6 +19,7 @@ from django.utils import timezone
 from django.shortcuts import redirect
 # Create your views here.
 from payment.zarinpal_client import ZarinPalSandbox
+from payment.parspay_client import ParsPaySandBox
 from payment.models import PaymentModel
 
 
@@ -37,6 +38,7 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         cleaned_data = form.cleaned_data
         address = cleaned_data['address_id']
         coupon = cleaned_data['coupon']
+        payment_method = cleaned_data.get('payment_method')
 
         cart = CartModel.objects.get(user=user)
         order = self.create_order(address)
@@ -47,7 +49,12 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         total_price = order.calculate_total_price()
         self.apply_coupon(coupon, order, user, total_price)
         order.save()
-        return redirect(self.create_payment_url(order))
+        if payment_method == 'zarinpal':
+            return redirect(self.create_payment_url(order))
+        elif payment_method == 'parspay':
+            return redirect(self.create_parspay_payment_url(order))
+        else:
+            return self.form_invalid(form)
 
     def create_payment_url(self, order):
         zarinpal = ZarinPalSandbox()
@@ -59,6 +66,23 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         order.payment = payment_obj
         order.save()
         return zarinpal.generate_payment_url(response.get("Authority"))
+    
+    def create_parspay_payment_url(self, order):
+        parspay = ParsPaySandBox(api_key="00000000aaaabbbbcccc000000000000")
+        try:
+            response = parspay.payment_request(order.get_price(), description=f'پرداخت سفارش {order.id}')
+            authority = response['payment_id']
+            payment_obj = PaymentModel.objects.create(
+                authority_id=authority,
+                amount=order.get_price(),
+                gateway='parspay',
+            )
+            order.payment = payment_obj
+            order.save()
+            return parspay.generate_payment_url(authority)
+        except Exception as e:
+            # هندل کردن خطا در صورت نیاز
+            return self.form_invalid(form=self.form_class)
 
     def create_order(self, address):
         return OrderModel.objects.create(
