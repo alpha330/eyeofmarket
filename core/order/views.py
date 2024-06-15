@@ -21,6 +21,8 @@ from django.shortcuts import redirect
 from payment.zarinpal_client import ZarinPalSandbox
 from payment.parspay_client import ParsPaySandBox
 from payment.models import PaymentModel
+from django.urls import reverse
+
 
 
 class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormView):
@@ -69,20 +71,17 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
     
     def create_parspay_payment_url(self, order):
         parspay = ParsPaySandBox(api_key="00000000aaaabbbbcccc000000000000")
-        try:
-            response = parspay.payment_request(order.get_price(), description=f'پرداخت سفارش {order.id}')
-            authority = response['payment_id']
-            payment_obj = PaymentModel.objects.create(
-                authority_id=authority,
-                amount=order.get_price(),
-                gateway='parspay',
-            )
-            order.payment = payment_obj
-            order.save()
-            return parspay.generate_payment_url(authority)
-        except Exception as e:
-            # هندل کردن خطا در صورت نیاز
-            return self.form_invalid(form=self.form_class)
+        print(f"the ammount:{order.get_price()} ,and type {type(order.get_price())}")
+        response = parspay.payment_request(amount=order.get_price())
+        print(response)
+
+        payment_obj = PaymentModel.objects.create(
+            authority_id=response.get("payment_id"),
+            amount=order.get_price(),
+        )
+        order.payment = payment_obj
+        order.save()
+        return response["link"]
 
     def create_order(self, address):
         return OrderModel.objects.create(

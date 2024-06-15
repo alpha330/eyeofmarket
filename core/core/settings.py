@@ -301,4 +301,4 @@ MERCHANT_ID = config("MERCHANT_ID",default="4ced0a1e-4ad8-4309-9668-3ea3ae8e8897
 SANDBOX_MODE = config("SANDBOX_MODE", cast=bool, default=True)
 
 # parspay sandbox
-MERCHANT_ID_PARSPAY = config("MERCHANT_ID_PARSPAY",default="00000000aaaabbbbcccc000000000000")
+PARSPAY_API_KEY = config("PARSPAY_API_KEY",default="00000000aaaabbbbcccc000000000000")

@@ -54,12 +54,12 @@ class PaymentVerifyParsPayView(View):
         payment_obj.ref_id = ref_id
         payment_obj.response_code = status_code
         payment_obj.status = PaymentStatusType.success.value if status_code in {
-            "ACCEPTED"} else PaymentStatusType.failed.value
+            "200"} else PaymentStatusType.failed.value
         payment_obj.response_json = response
         payment_obj.save()
 
         order.status = OrderStatusType.success.value if status_code in {
-            "ACCEPTED"} else OrderStatusType.failed.value
+            "200"} else OrderStatusType.failed.value
         order.save()
 
         return redirect(reverse_lazy("order:completed") if status_code in {"ACCEPTED"} else reverse_lazy("order:failed"))
