@@ -14,6 +14,8 @@ class PaymentModel(models.Model):
     amount = models.DecimalField(default=0,max_digits=10,decimal_places=0)
     response_json = JSONField(default=dict)
     response_code = models.IntegerField(null=True,blank=True)
+    payment_gateway = models.CharField(max_length=255,null=True,blank=True)
+    recipt_code = models.IntegerField(null=True,blank=True)
     status = models.IntegerField(choices=PaymentStatusType.choices,default=PaymentStatusType.pending.value)
     
     

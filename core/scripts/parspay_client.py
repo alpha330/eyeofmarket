@@ -28,10 +28,10 @@ class ParsPaySandBox:
         
         return response.json()
 
-    def payment_verify(self, receipt_number, amount, currency=None):
+    def payment_verify(self, id, amount, currency=None):
         payload = {
             "amount": amount,
-            "receipt_number": receipt_number,
+            "receipt_number": id,
             "currency": currency,
         }
         headers = {
@@ -60,11 +60,12 @@ if __name__ == "__main__":
         response = parspay.payment_request(15000.890)
         print(response)
         payment_url = response["link"]
-        print(f"Payment URL: {payment_url}")
+        payment_id = response["payment_id"]
+        print(f"Payment URL: {payment_url} and payment id :{payment_id}")
 
         input("Proceed to payment and press enter to verify...")
 
-        verification_response = parspay.payment_verify(str(response["payment_id"]), 15000)
+        verification_response = parspay.payment_verify(id=str(response["payment_id"]), amount=15000)
         print(verification_response)
 
     except Exception as e:

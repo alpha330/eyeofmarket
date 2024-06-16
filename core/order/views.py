@@ -17,11 +17,11 @@ from order.models import CouponModel
 from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import redirect
-# Create your views here.
 from payment.zarinpal_client import ZarinPalSandbox
 from payment.parspay_client import ParsPaySandBox
 from payment.models import PaymentModel
 from django.urls import reverse
+from django.contrib import messages
 
 
 
@@ -72,16 +72,22 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
     def create_parspay_payment_url(self, order):
         parspay = ParsPaySandBox(api_key="00000000aaaabbbbcccc000000000000")
         print(f"the ammount:{order.get_price()} ,and type {type(order.get_price())}")
-        response = parspay.payment_request(amount=order.get_price())
+        response = parspay.payment_request(amount=str(order.get_price()))
         print(response)
-
-        payment_obj = PaymentModel.objects.create(
-            authority_id=response.get("payment_id"),
-            amount=order.get_price(),
-        )
-        order.payment = payment_obj
-        order.save()
-        return response["link"]
+        if response.get("status") == "ACCEPTED":
+            payment_obj = PaymentModel.objects.create(
+                authority_id=response.get("payment_id"),
+                amount=order.get_price(),
+                payment_gateway = "ParsPay",
+                response_json = response,
+                response_code = "202"
+            )
+            order.payment = payment_obj
+            order.save()
+            return response["link"]
+        else :
+            messages.error(self.request,"مشکل در انتقال به درگاه پرداخت پارس پی")
+            return reverse("order:failed")
 
     def create_order(self, address):
         return OrderModel.objects.create(
