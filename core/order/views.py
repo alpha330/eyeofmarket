@@ -64,6 +64,8 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         payment_obj = PaymentModel.objects.create(
             authority_id=response.get("Authority"),
             amount=order.get_price(),
+            payment_gateway = "Zarinpal",
+            currency = "IRT",
         )
         order.payment = payment_obj
         order.save()
