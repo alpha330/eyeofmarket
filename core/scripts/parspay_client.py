@@ -5,7 +5,7 @@ from django.conf import settings
 class ParsPaySandBox:
     _payment_request_url = "https://sandbox.api.parspal.com/v1/payment/request"
     _payment_verify_url = "https://sandbox.api.parspal.com/v1/payment/verify"
-    _payment_page_url = "https://sandbox.api.parspal.com/v1/payment/redirect"
+    _payment_inquery_url = "https://sandbox.api.parspal.com/v1/payment/inquiry"
     _return_url = "http://127.0.0.1:8000/payment/verify/parspay"
 
     def __init__(self, api_key="00000000aaaabbbbcccc000000000000"):
@@ -48,9 +48,21 @@ class ParsPaySandBox:
 
         return result
 
-    def generate_payment_url(self, payment_id):
-        return self._payment_page_url + payment_id
-
+    def payment_inquery(self,amount,payment_id):
+        payload = {
+            "payment_id": payment_id,
+            "amount": amount
+        }
+        
+        headers ={
+            'Content-Type': 'application/json',
+            'APIKEY': self.api_key
+        }
+        response = requests.post(self._payment_inquery_url,headers=headers,data=json.dumps(payload))
+        result = response.json()
+        return result
+    
+    
 # Test the class
 if __name__ == "__main__":
     api_key = "00000000aaaabbbbcccc000000000000"
@@ -58,15 +70,21 @@ if __name__ == "__main__":
 
     try:
         response = parspay.payment_request(15000.890)
+        response_inquery = parspay.payment_inquery(amount=15000.890,payment_id=response["payment_id"])
         print(response)
+        print(response_inquery)
         payment_url = response["link"]
         payment_id = response["payment_id"]
         print(f"Payment URL: {payment_url} and payment id :{payment_id}")
 
         input("Proceed to payment and press enter to verify...")
-
-        verification_response = parspay.payment_verify(id=str(response["payment_id"]), amount=15000)
-        print(verification_response)
+        
+        if response_inquery["is_paymented"] is not True:
+            status = response_inquery["status"]
+            print (f"payment status is {status} and not payed without recipt number")
+        else:
+           verification_response = parspay.payment_verify(amount=response["amount"],currency=response["currency"],id=response_inquery["receipt_number"])
+           print(verification_response)
 
     except Exception as e:
         print(f"An error occurred: {e}")

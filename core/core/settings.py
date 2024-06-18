@@ -302,3 +302,4 @@ SANDBOX_MODE = config("SANDBOX_MODE", cast=bool, default=True)
 
 # parspay sandbox
 PARSPAY_API_KEY = config("PARSPAY_API_KEY",default="00000000aaaabbbbcccc000000000000")
+

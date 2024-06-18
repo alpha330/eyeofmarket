@@ -15,9 +15,9 @@ class PaymentModel(models.Model):
     response_json = JSONField(default=dict)
     response_code = models.IntegerField(null=True,blank=True)
     payment_gateway = models.CharField(max_length=255,null=True,blank=True)
-    recipt_code = models.IntegerField(null=True,blank=True)
+    recipt_code = models.BigIntegerField(null=True,blank=True)
     status = models.IntegerField(choices=PaymentStatusType.choices,default=PaymentStatusType.pending.value)
-    
+    currency=models.CharField(max_length=15,null=True,blank=True)
     
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)

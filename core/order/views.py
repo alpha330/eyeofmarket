@@ -79,8 +79,7 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
                 authority_id=response.get("payment_id"),
                 amount=order.get_price(),
                 payment_gateway = "ParsPay",
-                response_json = response,
-                response_code = "202"
+                currency="IRT"
             )
             order.payment = payment_obj
             order.save()

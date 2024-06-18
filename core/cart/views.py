@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django.http import JsonResponse
 from shop.models import ProductModel, ProductStatusType
+from django.contrib import messages
 from .cart import CartSession
 
 
@@ -15,6 +16,7 @@ class SessionAddProductView(View):
             cart.add_product(product_id)
         if request.user.is_authenticated:
             cart.merge_session_cart_in_db(request.user)
+        messages.success(self.request,"به سبد اضافه شد")
         return JsonResponse({"cart": cart.get_cart_dict(), "total_quantity": cart.get_total_quantity()})
 
 
@@ -27,6 +29,7 @@ class SessionRemoveProductView(View):
             cart.remove_product(product_id)
         if request.user.is_authenticated:
             cart.merge_session_cart_in_db(request.user)
+        messages.success(self.request,"از سبدحذف شد")
         return JsonResponse({"cart": cart.get_cart_dict(), "total_quantity": cart.get_total_quantity()})
 
 
