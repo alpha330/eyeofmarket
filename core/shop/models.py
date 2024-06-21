@@ -60,6 +60,16 @@ class ProductModel(models.Model):
     def is_published(self):
         return self.status == ProductStatusType.publish.value
     
+    def decrease_stock(self,quantity):
+            self.stock -= quantity
+            self.save()
+            
+    def back_to_stock(self,quantity):
+        self.stock += quantity
+        self.save()
+        
+        
+    
 class ProductImageModel(models.Model):
     product = models.ForeignKey(ProductModel,on_delete=models.CASCADE,related_name="product_images")
     file = models.ImageField(upload_to="product/extra-img/")
