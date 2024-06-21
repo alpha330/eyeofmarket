@@ -81,7 +81,7 @@
 
                                         <div class="col-auto ">
                                             <div class="d-grid gap-2 d-flex justify-content-between">
-                                                <button class=" btn btn-sm btn-icon text-danger border-0 mx-1" onclick="removeProduct('{{item.product_id}}')">
+                                                <button class=" btn btn-sm btn-icon text-danger border-0 mx-1" onclick="removeProduct('{{item.product_id}}',{{item.quantity}})">
                                                     <i class="bi-trash ms-1"></i> حذف
                                                 </button>
                                                 {% if request.user.is_authenticated %}
@@ -214,12 +214,13 @@
             }
         });
     }
-    function removeProduct(product_id){
+    function removeProduct(product_id,quantity){
         $.ajax({
             url: "{%  url 'cart:session-remove-product' %}",
             method: 'POST',
             data: {
                 product_id: product_id,
+                quantity: quantity,
                 csrfmiddlewaretoken: '{{ csrf_token }}'
     
             },

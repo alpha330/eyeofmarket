@@ -5,6 +5,13 @@ from django.utils import timezone
 class CheckOutForm(forms.Form):
     address_id = forms.IntegerField(required=True)
     coupon = forms.CharField(required=False)
+    payment_method = forms.ChoiceField(
+        choices=[
+            ('zarinpal', 'زرین‌پال'),
+            ('parspay', 'پارس پی')
+        ],
+        widget=forms.RadioSelect
+    )
     
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)

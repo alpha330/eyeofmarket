@@ -17,9 +17,12 @@ from order.models import CouponModel
 from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import redirect
-# Create your views here.
-# from payment.zarinpal_client import ZarinPalSandbox
-# from payment.models import PaymentModel
+from payment.zarinpal_client import ZarinPalSandbox
+from payment.parspay_client import ParsPaySandBox
+from payment.models import PaymentModel
+from django.urls import reverse
+from django.contrib import messages
+
 
 
 class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormView):
@@ -37,6 +40,7 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         cleaned_data = form.cleaned_data
         address = cleaned_data['address_id']
         coupon = cleaned_data['coupon']
+        payment_method = cleaned_data.get('payment_method')
 
         cart = CartModel.objects.get(user=user)
         order = self.create_order(address)
@@ -47,18 +51,44 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         total_price = order.calculate_total_price()
         self.apply_coupon(coupon, order, user, total_price)
         order.save()
-        return redirect('order:completed')
+        if payment_method == 'zarinpal':
+            return redirect(self.create_payment_url(order))
+        elif payment_method == 'parspay':
+            return redirect(self.create_parspay_payment_url(order))
+        else:
+            return self.form_invalid(form)
 
-    # def create_payment_url(self, order):
-    #     zarinpal = ZarinPalSandbox()
-    #     response = zarinpal.payment_request(order.get_price())
-    #     payment_obj = PaymentModel.objects.create(
-    #         authority_id=response.get("Authority"),
-    #         amount=order.get_price(),
-    #     )
-    #     order.payment = payment_obj
-    #     order.save()
-    #     return zarinpal.generate_payment_url(response.get("Authority"))
+    def create_payment_url(self, order):
+        zarinpal = ZarinPalSandbox()
+        response = zarinpal.payment_request(order.get_price())
+        payment_obj = PaymentModel.objects.create(
+            authority_id=response.get("Authority"),
+            amount=order.get_price(),
+            payment_gateway = "Zarinpal",
+            currency = "IRT",
+        )
+        order.payment = payment_obj
+        order.save()
+        return zarinpal.generate_payment_url(response.get("Authority"))
+    
+    def create_parspay_payment_url(self, order):
+        parspay = ParsPaySandBox(api_key="00000000aaaabbbbcccc000000000000")
+        print(f"the ammount:{order.get_price()} ,and type {type(order.get_price())}")
+        response = parspay.payment_request(amount=str(order.get_price()))
+        print(response)
+        if response.get("status") == "ACCEPTED":
+            payment_obj = PaymentModel.objects.create(
+                authority_id=response.get("payment_id"),
+                amount=order.get_price(),
+                payment_gateway = "ParsPay",
+                currency="IRT"
+            )
+            order.payment = payment_obj
+            order.save()
+            return response["link"]
+        else :
+            messages.error(self.request,"مشکل در انتقال به درگاه پرداخت پارس پی")
+            return reverse("order:failed")
 
     def create_order(self, address):
         return OrderModel.objects.create(
