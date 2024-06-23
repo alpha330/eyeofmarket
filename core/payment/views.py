@@ -65,6 +65,7 @@ class PaymentVerifyParsPayView(View):
             payment_obj = get_object_or_404(
                 PaymentModel, authority_id=authority_id)
             order = OrderModel.objects.get(payment=payment_obj)
+            order_items = OrderItemModel.objects.filter(order=order)
             currency = payment_obj.currency
             parspay = ParsPaySandBox()
             response = parspay.payment_verify(
@@ -78,7 +79,7 @@ class PaymentVerifyParsPayView(View):
                 payment_obj.save()
                 order.status = OrderStatusType.success.value
                 order.save()
-                messages.success(self.request,response["message"])
+                messages.success(self.request,response["message"])                
                 return redirect(reverse_lazy("order:completed"))
             else:
                 payment_obj.ref_id = authority_id
@@ -90,6 +91,10 @@ class PaymentVerifyParsPayView(View):
                 order.status = OrderStatusType.failed.value
                 order.save() 
                 messages.error(self.request,response["message"])
+                for item in order_items:
+                    quantity = item.quantity
+                    product_id = item.product.id
+                    ProductCountsManagement.return_to_stock(product_id=product_id, quantity=quantity)
                 return redirect(reverse_lazy("order:failed"))
         else:
             authority_id = request.POST.get("payment_id")
@@ -97,6 +102,7 @@ class PaymentVerifyParsPayView(View):
             payment_obj = get_object_or_404(
                 PaymentModel, authority_id=authority_id)
             order = OrderModel.objects.get(payment=payment_obj)
+            order_items = OrderItemModel.objects.filter(order=order)
             parspay = ParsPaySandBox() 
             response_inquery = parspay.payment_inquery(amount=int(payment_obj.amount),payment_id=payment_obj.authority_id)
             payment_obj.ref_id = authority_id
@@ -107,4 +113,8 @@ class PaymentVerifyParsPayView(View):
             payment_obj.save()
             order.status = OrderStatusType.failed.value
             order.save() 
+            for item in order_items:
+                    quantity = item.quantity
+                    product_id = item.product.id
+                    ProductCountsManagement.return_to_stock(product_id=product_id, quantity=quantity)
             return redirect(reverse_lazy("order:failed"))
