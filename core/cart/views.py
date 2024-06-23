@@ -43,9 +43,9 @@ class SessionUpdateProductQuantityView(View):
         cart = CartSession(request.session)
         product_id = request.POST.get("product_id")
         quantity = request.POST.get("quantity")
+        
         if product_id and quantity:
             cart.update_product_quantity(product_id, quantity)
-            ProductCountsManagement.stock_updates(product_id=product_id,quantity=(int(quantity)))
         if request.user.is_authenticated:
             cart.merge_session_cart_in_db(request.user)
         return JsonResponse({"cart": cart.get_cart_dict(), "total_quantity": cart.get_total_quantity()})

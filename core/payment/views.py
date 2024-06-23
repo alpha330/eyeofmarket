@@ -5,10 +5,11 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
 from .zarinpal_client import ZarinPalSandbox
 from .parspay_client import ParsPaySandBox
-from order.models import OrderModel, OrderStatusType
+from order.models import OrderModel, OrderStatusType,OrderItemModel
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib import messages
+from cart.validators import ProductCountsManagement
 
 # Create your views here.
 
@@ -22,6 +23,7 @@ class PaymentVerifyView(View):
         payment_obj = get_object_or_404(
             PaymentModel, authority_id=authority_id)
         order = OrderModel.objects.get(payment=payment_obj)
+        order_items = OrderItemModel.objects.filter(order=order)
         zarin_pal = ZarinPalSandbox() 
         response = zarin_pal.payment_verify(
             int(payment_obj.amount), payment_obj.authority_id)
@@ -38,8 +40,14 @@ class PaymentVerifyView(View):
         order.status = OrderStatusType.success.value if status_code in {
             100, 101} else OrderStatusType.failed.value
         order.save()
-
-        return redirect(reverse_lazy("order:completed") if status_code in {100, 101} else reverse_lazy("order:failed"))
+        if status_code in {100, 101}:
+            return redirect(reverse_lazy("order:completed"))
+        else:
+            for item in order_items:
+                quantity = item.quantity
+                product_id = item.product.id
+                ProductCountsManagement.return_to_stock(product_id=product_id, quantity=quantity)
+            return redirect(reverse_lazy("order:failed"))
     
 class PaymentVerifyParsPayView(View):
     
