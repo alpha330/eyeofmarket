@@ -233,9 +233,15 @@
             <!-- End Accordion -->
 
             <div class="d-grid mb-4">
-                <button type="button" class="btn btn-primary btn-sm btn-transition rounded-pill"
-                                onclick="addToCart('{{object.id}}')">افزودن به سبد
-                                خرید</button>
+                {% if object.stock > 0 %}
+                <button type="button" class="btn btn-outline-primary btn-sm btn-transition rounded-pill"
+                    onclick="addToCart('{{object.id}}')">افزودن به سبد
+                    خرید</button>
+                {% else %}
+                <div class="row text-center w-100 py-5">
+                    <p class="text-center">موجود نمی باشد</p>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Media -->

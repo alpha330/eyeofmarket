@@ -1,5 +1,6 @@
 from shop.models import ProductModel,ProductStatusType
 from cart.models import CartModel,CartItemModel
+from .validators import ProductCountsManagement
 
 class CartSession:
     def __init__(self, session):
@@ -8,7 +9,15 @@ class CartSession:
 
     def update_product_quantity(self,product_id,quantity):
         for item in self._cart["items"]:
-            if product_id == item["product_id"]:
+            if product_id == item["product_id"] and int(quantity) > int(item["quantity"]):
+                def_quntity = int(quantity)-int(item["quantity"])
+                ProductCountsManagement.stock_updates(product_id=product_id,quantity=def_quntity)
+                item["quantity"] = int(quantity)
+                self.save()
+                break
+            elif product_id == item["product_id"] and int(quantity) < int(item["product_id"]):
+                def_quntity = int(item["quantity"]) - int(quantity)
+                ProductCountsManagement.return_to_stock(product_id=product_id,quantity=def_quntity)
                 item["quantity"] = int(quantity)
                 self.save()
                 break

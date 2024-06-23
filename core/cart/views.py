@@ -12,9 +12,15 @@ class SessionAddProductView(View):
     def post(self, request, *args, **kwargs):
         cart = CartSession(request.session)
         product_id = request.POST.get("product_id")
-        if product_id and ProductModel.objects.filter(id=product_id, status=ProductStatusType.publish.value).exists():
+        product = ProductModel.objects.filter(id=product_id, status=ProductStatusType.publish.value)
+        product_stock = ProductModel.objects.get(id=product_id,status=ProductStatusType.publish.value)
+        if product_id and product.exists() and product_stock.stock > 0:
             cart.add_product(product_id)
             ProductCountsManagement.stock_updates(product_id=product_id,quantity=1)
+        else:
+            print("موجود نیست")
+            messages.error(self.request,"در انبار موجود نمی باشد")
+            return JsonResponse({"cart": cart.get_cart_dict(), "total_quantity": cart.get_total_quantity()})
         if request.user.is_authenticated:
             cart.merge_session_cart_in_db(request.user)
         messages.success(self.request,"به سبد اضافه شد")
@@ -43,9 +49,9 @@ class SessionUpdateProductQuantityView(View):
         cart = CartSession(request.session)
         product_id = request.POST.get("product_id")
         quantity = request.POST.get("quantity")
+        
         if product_id and quantity:
             cart.update_product_quantity(product_id, quantity)
-            ProductCountsManagement.stock_updates(product_id=product_id,quantity=(int(quantity)-1))
         if request.user.is_authenticated:
             cart.merge_session_cart_in_db(request.user)
         return JsonResponse({"cart": cart.get_cart_dict(), "total_quantity": cart.get_total_quantity()})
