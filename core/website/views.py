@@ -4,11 +4,26 @@ from django.contrib import messages
 from website.forms import TicketForm, NewsLetterForm
 from accounts.tasks import sendEmail
 from accounts.models import Profile
+from shop.models import ProductModel
 # VIEWS CONFIG OF WEBSITE APP webiste.urls <----> website.views
 
 
 class IndexView(TemplateView):
     template_name = "website/index.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super(TemplateView, self).get_context_data(**kwargs)
+        selected_products = ProductModel.objects.filter(status=1)[:3]
+        
+        product_ids_dict = []
+        for product in selected_products:
+            product_ids_dict.append(product.id)
+        context["select_1"]=ProductModel.objects.get(id=product_ids_dict[0])
+        context["select_2"]=ProductModel.objects.get(id=product_ids_dict[1])
+        context["select_3"]=ProductModel.objects.get(id=product_ids_dict[2])
+        return context
+    
+    
 
 
 class ContactView(FormView):
