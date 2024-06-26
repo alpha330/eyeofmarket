@@ -39,15 +39,13 @@ class RegisterView(FormView):
             user_obj = get_object_or_404(User, email=email)
             token = self.get_tokens_for_user(user_obj)
             sendEmail.delay(
-                template="email/activate_user.tpl",
+                template="email/activate.tpl",
                 context={"token": token, "user": str(
                     user_obj)},
                 from_email="xigma@afarineshvc.ir",
                 recipient_list=[email,],
             )
-            
-            # You can optionally log in the user after registration
-            # login(request, user)
+            messages.success(self.request,"ثبت نام انجام شد  و لینک وریفای ارسال  شد")
             return redirect('accounts:login')  # Redirect to login page after successful registration
         return render(request, 'accounting/register.html', {'form': form})
     

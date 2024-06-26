@@ -5,8 +5,5 @@
 {% endblock %}
 
 {% block html %}
-<h3>{{email}}<h3>
-<p><h2>{{first_name}}</h2></p>
-<p><h2>{{last_name}}</h2></p>
 <p><h2>لینک فعالسازی </h2></p>
 {% endblock %}
