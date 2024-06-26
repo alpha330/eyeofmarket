@@ -5,5 +5,5 @@
 {% endblock %}
 
 {% block html %}
-<p><a href="{% url 'accounts:activate' token={{token}} %}"><h2>لینک فعالسازی </h2></a></p>
+<p><a href="{% url 'accounts:activation' token=token %}"><h2>لینک فعالسازی </h2></a></p>
 {% endblock %}

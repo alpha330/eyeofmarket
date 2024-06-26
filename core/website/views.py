@@ -44,12 +44,21 @@ class ContactView(FormView):
         messages.success(self.request, "درخواست شما ثبت شد")
         form.save()
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"{field}: {error}")
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(ContactView, self).get_context_data(**kwargs)
-        user = self.request.user
-        context["profile"] = Profile.objects.get(user=user)
-        return context
+        if self.request.user.is_authenticated:
+            context = super(ContactView, self).get_context_data(**kwargs)
+            user = self.request.user
+            context["profile"] = Profile.objects.get(user=user)
+            return context
+        else:
+            pass
 
     def get_success_url(self):
         return reverse('website:index')

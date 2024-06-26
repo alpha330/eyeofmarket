@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_recaptcha',
     "rest_framework_simplejwt",
     'ckeditor',
     'mail_templated',
@@ -303,4 +304,8 @@ SANDBOX_MODE = config("SANDBOX_MODE", cast=bool, default=True)
 
 # parspay sandbox
 PARSPAY_API_KEY = config("PARSPAY_API_KEY",default="00000000aaaabbbbcccc000000000000")
+
+GOOGLE_RECAPTCHA_SITE_KEY = '6Le_xgEqAAAAAE9R3QGLKCfmr-cPFAQlgaELjot7' 
+GOOGLE_RECAPTCHA_SECRET_KEY = '6Le_xgEqAAAAACt4hDyAHJnQH4QeXEjWQbpbRKz0'
+SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
 

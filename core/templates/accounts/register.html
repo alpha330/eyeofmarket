@@ -37,6 +37,7 @@
                     <a id="changePassTarget" class="input-group-append input-group-text" href="javascript:;">
                         <i id="changePassIcon" class="bi-eye"></i>
                     </a>
+                    <span class="invalid-feedback"></span>{{form.errors}}</span>
                 </div>
 
                 <span class="invalid-feedback">لطفا یک گذر واژه معتبر وارد کنید.</span>
@@ -57,6 +58,9 @@
                 </div>
 
                 <span class="invalid-feedback">لطفا یک گذر واژه معتبر وارد کنید.</span>
+                <div class="input-group input-group-merge">
+                {{form.captcha}}
+                </div>
             </div>
             <!-- End Form -->
 

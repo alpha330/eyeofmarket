@@ -1,7 +1,16 @@
 from django import forms
 from website.models import TicketingFormModel,NewsLetterModel
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
+from django_recaptcha.fields import ReCaptchaField
 
 class TicketForm(forms.ModelForm):
+    
+    captcha = ReCaptchaField(
+        public_key="6LcLzgEqAAAAAEBMBYp9VmWnP4UCqVlbnGxMmeBP",
+        private_key="6LcLzgEqAAAAAFBGfbQzPBeM21rM8sPJvKQ26-cx",
+        widget=ReCaptchaV2Checkbox,
+        required=True,
+        )
     
     class Meta:
         model = TicketingFormModel
@@ -11,7 +20,8 @@ class TicketForm(forms.ModelForm):
             'email_address',
             'mobile_number',
             'subject',
-            'message',       
+            'message',
+            'captcha',       
         ]
         
 class NewsLetterForm(forms.ModelForm):

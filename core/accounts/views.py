@@ -31,6 +31,7 @@ class RegisterView(FormView):
     form_class = UserRegistrationForm
     success_url = reverse_lazy("accounts:login")
     
+    
     def post(self, request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -47,7 +48,8 @@ class RegisterView(FormView):
             )
             messages.success(self.request,"ثبت نام انجام شد  و لینک وریفای ارسال  شد")
             return redirect('accounts:login')  # Redirect to login page after successful registration
-        return render(request, 'accounting/register.html', {'form': form})
+        messages.error(self.request,form.error_messages)
+        return redirect('accounts:register')
     
     def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)
@@ -124,7 +126,7 @@ class ActivateAccountView(View):
         user_object = User.objects.get(pk=user_id)
         if user_object.is_active == False:
             user_object.is_active = True
-            user_object.is_verify = True
+            user_object.is_verified = True
             user_object.save()
             messages.success(self.request,"کاربر  فعال شد ")
             return redirect("accounts:login")
