@@ -184,6 +184,17 @@ LOGOUT_REDIRECT_URL = "/"
 # REDIS CONETCTION FOR CELERY
 CELERY_BROKER_URL = 'redis://redis-emarket:6379/1'
 
+# REDIS CACHING SERVER CONFIG ---> DOCKER CONTAINER REDIS
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": 'redis://redis-emarket:6379/2',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=48),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
