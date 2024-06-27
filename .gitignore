@@ -156,4 +156,5 @@ postgres/data/*
 
 # ignore media
 media/*
+core/shop/management/images/*
 
