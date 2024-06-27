@@ -243,7 +243,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="formPhoneNumber">شماره همراه </label>
                                 <input type="text" class="form-control form-control-lg " name="mobile_number" dir="ltr"
-                                    id="formPhoneNumber" placeholder="+9891200000" required>
+                                    id="formPhoneNumber" placeholder="091200000" required>
                             </div>
                             <!-- End Form -->
                         </div>
@@ -271,9 +271,11 @@
                             id="formDescription" placeholder="توضیحات خود را وارد نمایید"
                             aria-label="Tell us about your ..." rows="4" required></textarea>
                     </div>
+
                     <!-- End Form -->
                     {% endif %}
 
+                    {{form.captcha}}
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">ارسال درخواست</button>
                     </div>

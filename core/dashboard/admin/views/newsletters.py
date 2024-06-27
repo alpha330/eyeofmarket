@@ -28,7 +28,7 @@ class NewsletterListView(LoginRequiredMixin, HasAdminAccessPermission, ListView)
         return self.request.GET.get('paginate_by', self.paginate_by)
     
     def get_queryset(self):
-        queryset = NewsLetterModel.objects.all().order_by("-created_date")
+        queryset = NewsLetterModel.objects.all().order_by("-created_at")
         search_query = self.request.GET.get('q', None)
         ordering_query = self.request.GET.get('ordering', None)
 
