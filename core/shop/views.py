@@ -11,21 +11,36 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from review.models import ReviewModel,ReviewStatusType
 from django.core.cache import cache
+from django.core import serializers
 
 # Create your views here.
 
 
 class ShopProductGridView(ListView):
     template_name = 'shop/product_grid.html'
-    queryset = ProductModel.objects.filter(status=ProductStatusType.publish.value)
     paginate_by = 9
-    
+
     def get_paginate_by(self, queryset):
         return self.request.GET.get('page_size', self.paginate_by)
-    
+
     def get_queryset(self):
-        queryset = ProductModel.objects.filter(
-            status=ProductStatusType.publish.value)
+        cache_key = "grid_view_model"
+        cached_data = cache.get(cache_key)
+
+        if not cached_data:
+            print("Cache miss - Querying database")
+            queryset = ProductModel.objects.filter(status=ProductStatusType.publish.value)
+            # Serialize the queryset to JSON
+            serialized_data = serializers.serialize('json', queryset)
+            cache.set(cache_key, serialized_data, timeout=60*15)  # Cache for 15 minutes
+        else:
+            print("Cache hit")
+            # Deserialize the JSON data to a queryset
+            queryset = [obj.object for obj in serializers.deserialize('json', cached_data)]
+
+        # Apply additional filters if present
+        queryset = ProductModel.objects.filter(pk__in=[obj.pk for obj in queryset])
+
         if search_q := self.request.GET.get("q"):
             queryset = queryset.filter(title__icontains=search_q)
         if category_id := self.request.GET.get("category_id"):
@@ -39,11 +54,12 @@ class ShopProductGridView(ListView):
                 queryset = queryset.order_by(order_by)
             except FieldError:
                 pass
+
         return queryset
-    
+
     def get_context_data(self, **kwargs):
-        context =  super().get_context_data(**kwargs)
-        context["total_items"] = self.get_queryset().count() 
+        context = super().get_context_data(**kwargs)
+        context["total_items"] = self.get_queryset().count()
         context["categories"] = ProductCategoryModel.objects.all()
         return context
 
