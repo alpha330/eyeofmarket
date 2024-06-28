@@ -59,8 +59,24 @@ class ShopProductGridView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_items"] = self.get_queryset().count()
-        context["categories"] = ProductCategoryModel.objects.all()
+
+        # Check if context data is in cache
+        cache_key_total_items = "total_items"
+        cache_key_categories = "product_categories"
+
+        total_items = cache.get(cache_key_total_items)
+        if total_items is None:
+            total_items = self.get_queryset().count()
+            cache.set(cache_key_total_items, total_items, timeout=60*15)  # Cache for 15 minutes
+
+        categories = cache.get(cache_key_categories)
+        if categories is None:
+            categories = list(ProductCategoryModel.objects.all())
+            cache.set(cache_key_categories, categories, timeout=60*15)  # Cache for 15 minutes
+
+        context["total_items"] = total_items
+        context["categories"] = categories
+
         return context
 
 class ShopProductDetailView(DetailView):
