@@ -4,7 +4,8 @@ from django.contrib import messages
 from website.forms import TicketForm, NewsLetterForm
 from accounts.tasks import sendEmail
 from accounts.models import Profile
-from shop.models import ProductModel
+from shop.models import ProductModel,ProductCategoryModel
+from django.db.models import Count
 # VIEWS CONFIG OF WEBSITE APP webiste.urls <----> website.views
 
 
@@ -13,15 +14,27 @@ class IndexView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super(TemplateView, self).get_context_data(**kwargs)
-        selected_products = ProductModel.objects.filter(status=1)[:3]
-        
-        product_ids_dict = []
-        for product in selected_products:
-            product_ids_dict.append(product.id)
-        context["select_1"]=ProductModel.objects.get(id=product_ids_dict[0])
-        context["select_2"]=ProductModel.objects.get(id=product_ids_dict[1])
-        context["select_3"]=ProductModel.objects.get(id=product_ids_dict[2])
+        selected_products = ProductModel.objects.filter(status=1, is_featured=True)[:3]
+        prime_group = ProductCategoryModel.objects.filter(is_featured=True)[:3]
+        if selected_products :
+            context["select_1"]=selected_products[0]
+            context["select_2"]=selected_products[1]
+            context["select_3"]=selected_products[2]
+        else:
+            print("No Product in Stock")
+            messages.warning(self.request,"محصولی در انبار موجود نیست")
+            
+        if len(prime_group) == 3:
+            card_a = ProductModel.objects.filter(status=1,category=prime_group[0])[:3]
+            context["card_a_1"]=card_a[0]
+            context["card_a_2"]=card_a[1]
+            context["card_a_3"]=card_a[2]
+        else:
+            print("No Product in Stock")
+            messages.warning(self.request,"محصولی در گروه محصول موجود نیست")
+          
         return context
+            
     
     
 

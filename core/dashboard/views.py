@@ -18,6 +18,8 @@ class DashboardHomeView(LoginRequiredMixin, View):
                 return redirect(reverse_lazy('dashboard:customer:home'))
             elif user_type == UserType.admin.value:
                 return redirect(reverse_lazy('dashboard:admin:home'))
+            elif user_type == UserType.superuser.value:
+                return redirect(reverse_lazy('dashboard:admin:home'))
             else:
                 # اگر نوع کاربر نه مشتری باشد و نه ادمین، به صفحه‌ای مناسب هدایت شود
                 return redirect(reverse_lazy('accounts:login'))

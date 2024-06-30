@@ -1,0 +1,72 @@
+version : "3"
+
+services:
+    redis-emarket:
+      container_name: redis-emarket  
+      build: 
+        context: .
+        dockerfile: ./dockerfiles/stage/django/Dockerfile
+      image: redis
+      restart: always
+      ports:
+        - "6379:6379"
+      command : redis-server --save 60 1 --loglevel warning
+
+    DB:
+      container_name : DataBase
+      build: 
+        context: .
+        dockerfile: ./dockerfiles/stage/django/Dockerfile
+      image : postgres:15-alpine
+      volumes :
+        - ./postgres/data:/var/lib/postgresql/data
+      environment:
+        - POSTGRES_DB=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+      expose:
+        - 5432
+      restart: always
+
+    backend-server:
+      container_name: django-backend
+      build: 
+        context: .
+        dockerfile: ./dockerfiles/stage/django/Dockerfile
+      volumes:
+        - ./core:/usr/src/app
+      working_dir: /usr/src/app
+      command: gunicorn core.wsgi --bind 0.0.0.0:8000
+      ports:
+        - "8000:8000"
+      environment:
+        - DEBUG=True
+      restart: always
+      depends_on:
+       - DB
+       - redis-emarket
+
+    worker_emarket_celery:
+      build: 
+        context: .
+        dockerfile: ./dockerfiles/stage/django/Dockerfile
+      command: celery -A core worker --loglevel=info
+      depends_on:
+        - redis-emarket
+        - backend-server
+
+    nginx:
+      image: nginx
+      container_name: nginx
+      restart: always
+      ports: 
+        - "80:80"
+      volumes:
+        - ./default.conf:/etc/nginx/conf.d/default.conf
+      depends_on:
+        - backend-server
+        - redis-emarket
+
+
+
+

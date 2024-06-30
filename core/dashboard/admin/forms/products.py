@@ -1,5 +1,6 @@
 from django import forms
 from shop.models import ProductModel, ProductImageModel
+from django.core.exceptions import ValidationError
 
 
 class ProductForm(forms.ModelForm):
@@ -16,6 +17,7 @@ class ProductForm(forms.ModelForm):
             "stock",
             "status",
             "price",
+            "is_featured",
             "discount_percent",
         ]
 
@@ -32,6 +34,15 @@ class ProductForm(forms.ModelForm):
         self.fields['status'].widget.attrs['class'] = 'form-select'
         self.fields['price'].widget.attrs['class'] = 'form-control'
         self.fields['discount_percent'].widget.attrs['class'] = 'form-control'
+        self.fields['is_featured'].widget.attrs['class'] = 'form-check-input'
+
+    def clean_is_featured(self):
+        is_featured = self.cleaned_data.get('is_featured', False)
+        if is_featured:
+            featured_count = ProductModel.objects.filter(is_featured=True).exclude(id=self.instance.id).count()
+            if featured_count >= 3:
+                raise ValidationError("فقط سه محصول می‌توانند به عنوان ویژه انتخاب شوند.")
+        return is_featured
 
 
 class ProductImageForm(forms.ModelForm):

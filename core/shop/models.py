@@ -2,6 +2,7 @@
 from django.db import models
 from decimal import Decimal
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
 
 
 class ProductStatusType(models.IntegerChoices):
@@ -12,7 +13,7 @@ class ProductStatusType(models.IntegerChoices):
 class ProductCategoryModel(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(allow_unicode=True,unique=True)
-    
+    is_featured = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     
@@ -21,6 +22,16 @@ class ProductCategoryModel(models.Model):
         
     def __str__(self):
         return self.title
+    
+    def clean(self):
+        if self.is_featured:
+            featured_count = ProductCategoryModel.objects.filter(is_featured=True).exclude(id=self.id).count()
+            if featured_count >= 3:
+                raise ValidationError("فقط سه دسته‌بندی می‌توانند به عنوان ویژه انتخاب شوند.")
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 # Create your models here.
@@ -32,7 +43,7 @@ class ProductModel(models.Model):
     image = models.ImageField(default="/default/product-image.png",upload_to="product/img/")
     description = models.TextField()
     brief_description = models.TextField(null=True,blank=True)
-    
+    is_featured = models.BooleanField(default=False)
     stock = models.PositiveIntegerField(default=0)
     status = models.IntegerField(choices=ProductStatusType.choices,default=ProductStatusType.draft.value)
     price = models.DecimalField(default=0,max_digits=10,decimal_places=0)
@@ -67,6 +78,16 @@ class ProductModel(models.Model):
     def back_to_stock(self,quantity):
         self.stock += quantity
         self.save()
+        
+    def clean(self):
+        if self.is_featured:
+            featured_count = ProductModel.objects.filter(is_featured=True).exclude(id=self.id).count()
+            if featured_count >= 3:
+                raise ValidationError("فقط سه محصول می‌توانند به عنوان ویژه انتخاب شوند.")
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
         
         
     

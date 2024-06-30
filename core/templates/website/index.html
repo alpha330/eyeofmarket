@@ -12,6 +12,7 @@
             <!-- Slide -->
             <div class="swiper-slide">
                 <!-- Container -->
+                {% if select_1 %}
                 <div class="container content-space-t-2 content-space-b-3">
                     <div class="row align-items-lg-center">
                         <div class="col-lg-5 order-lg-2 mb-7 mb-lg-0">
@@ -21,7 +22,7 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <a class="btn btn-primary rounded-pill" href="#">نمایش جزئیات محصول</a>
+                                <a class="btn btn-primary rounded-pill" href="{% url 'shop:product-detail' slug=select_1.slug %}">نمایش جزئیات محصول</a>
                             </div>
                         </div>
                         <!-- End Col -->
@@ -35,16 +36,13 @@
                     </div>
                     <!-- End Row -->
                 </div>
-                <!-- End Container --> 
-            </div>
-            <div class="swiper-slide">
-                <!-- Container -->
+                {% else %}
                 <div class="container content-space-t-2 content-space-b-3">
                     <div class="row align-items-lg-center">
                         <div class="col-lg-5 order-lg-2 mb-7 mb-lg-0">
                             <div class="mb-6">
-                                <h1 class="display-4 mb-4">{{select_2.title|slice:"10"}}</h1>
-                                <p>{{select_2.brief_description|safe}}</p>
+                                <h1 class="display-4 mb-4">محصولی وجود ندارد</h1>
+                                <p>محصولی وجود ندارد</p>
                             </div>
 
                             <div class="d-flex gap-2">
@@ -54,7 +52,7 @@
                         <!-- End Col -->
                         <div class="col-lg-6 order-lg-1">
                             <div class="w-75 mx-auto">
-                                <img class="img-fluid" src={{select_2.image.url}}
+                                <img class="img-fluid" src="{% static 'svg/logos/logo.svg' %}"
                                     alt="Image Description">
                             </div>
                         </div>
@@ -62,10 +60,66 @@
                     </div>
                     <!-- End Row -->
                 </div>
+                {% endif %}
                 <!-- End Container --> 
             </div>
             <div class="swiper-slide">
                 <!-- Container -->
+                {% if select_2 %}
+                <div class="container content-space-t-2 content-space-b-3">
+                    <div class="row align-items-lg-center">
+                        <div class="col-lg-5 order-lg-2 mb-7 mb-lg-0">
+                            <div class="mb-6">
+                                <h1 class="display-4 mb-4">{{select_2.title|slice:"10"}}</h1>
+                                <p>{{select_2.brief_description|safe}}</p>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-primary rounded-pill" href="{% url 'shop:product-detail' slug=select_2.slug %}">نمایش جزئیات محصول</a>
+                            </div>
+                        </div>
+                        <!-- End Col -->
+                        <div class="col-lg-6 order-lg-1">
+                            <div class="w-75 mx-auto">
+                                <img class="img-fluid" src={{select_2.image.url}}
+                                    alt="Image Description">
+                            </div>
+                        </div>
+                        
+                        <!-- End Col -->
+                    </div>
+                    <!-- End Row -->
+                </div>
+                {% else %}
+                <div class="container content-space-t-2 content-space-b-3">
+                            <div class="row align-items-lg-center">
+                                <div class="col-lg-5 order-lg-2 mb-7 mb-lg-0">
+                                    <div class="mb-6">
+                                        <h1 class="display-4 mb-4">محصولی وجود ندارد</h1>
+                                        <p>محصولی وجود ندارد</p>
+                                    </div>
+        
+                                    <div class="d-flex gap-2">
+                                        <a class="btn btn-primary rounded-pill" href="#">نمایش جزئیات محصول</a>
+                                    </div>
+                                </div>
+                                <!-- End Col -->
+                                <div class="col-lg-6 order-lg-1">
+                                    <div class="w-75 mx-auto">
+                                        <img class="img-fluid" src="{% static 'svg/logos/logo.svg' %}"
+                                            alt="Image Description">
+                                    </div>
+                                </div>
+                                <!-- End Col -->
+                            </div>
+                            <!-- End Row -->
+                </div>
+                {% endif %}
+                <!-- End Container --> 
+            </div>
+            <div class="swiper-slide">
+                <!-- Container -->
+                {% if select_3 %}
                 <div class="container content-space-t-2 content-space-b-3">
                     <div class="row align-items-lg-center">
                         <div class="col-lg-5 order-lg-2 mb-7 mb-lg-0">
@@ -75,7 +129,7 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <a class="btn btn-primary rounded-pill" href="#">نمایش جزئیات محصول</a>
+                                <a class="btn btn-primary rounded-pill" href="{% url 'shop:product-detail' slug=select_3.slug %}">نمایش جزئیات محصول</a>
                             </div>
                         </div>
                         <!-- End Col -->
@@ -89,6 +143,31 @@
                     </div>
                     <!-- End Row -->
                 </div>
+                {% else %}
+                <div class="container content-space-t-2 content-space-b-3">
+                    <div class="row align-items-lg-center">
+                        <div class="col-lg-5 order-lg-2 mb-7 mb-lg-0">
+                            <div class="mb-6">
+                                <h1 class="display-4 mb-4">محصولی وجود ندارد</h1>
+                                <p>محصولی وجود ندارد</p>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-primary rounded-pill" href="#">نمایش جزئیات محصول</a>
+                            </div>
+                        </div>
+                        <!-- End Col -->
+                        <div class="col-lg-6 order-lg-1">
+                            <div class="w-75 mx-auto">
+                                <img class="img-fluid" src="{% static 'svg/logos/logo.svg' %}"
+                                    alt="Image Description">
+                            </div>
+                        </div>
+                        <!-- End Col -->
+                    </div>
+                    <!-- End Row -->
+                </div>
+                {% endif %}
                 <!-- End Container --> 
             </div>
             <!-- End Slide -->
@@ -105,24 +184,51 @@
         <div class="js-swiper-shop-hero-thumbs swiper" style="max-width: 13rem;">
             <div class="swiper-wrapper">
                 <!-- Slide -->
+                 {% if select_1 %}
                 <div class="swiper-slide">
                     <a class="js-swiper-thumb-progress swiper-thumb-progress-avatar" href="javascript:;" tabindex="0">
                         <img class="swiper-thumb-progress-avatar-img" src="{{select_1.image.url}}"
                             alt="Image Description">
                     </a>
                 </div>
+                {% else %}
+                <div class="swiper-slide">
+                    <a class="js-swiper-thumb-progress swiper-thumb-progress-avatar" href="javascript:;" tabindex="0">
+                        <img class="swiper-thumb-progress-avatar-img" src="{% static 'svg/logos/logo.svg' %}"
+                            alt="Image Description">
+                    </a>
+                </div>
+                {% endif %}
+                {% if select_2 %}
                 <div class="swiper-slide">
                     <a class="js-swiper-thumb-progress swiper-thumb-progress-avatar" href="javascript:;" tabindex="0">
                         <img class="swiper-thumb-progress-avatar-img" src="{{select_2.image.url}}"
                             alt="Image Description">
                     </a>
                 </div>
+                {% else %}
+                <div class="swiper-slide">
+                    <a class="js-swiper-thumb-progress swiper-thumb-progress-avatar" href="javascript:;" tabindex="0">
+                        <img class="swiper-thumb-progress-avatar-img" src="{% static 'svg/logos/logo.svg' %}"
+                            alt="Image Description">
+                    </a>
+                </div>
+                {% endif %}
+                {% if select_3 %}
                 <div class="swiper-slide">
                     <a class="js-swiper-thumb-progress swiper-thumb-progress-avatar" href="javascript:;" tabindex="0">
                         <img class="swiper-thumb-progress-avatar-img" src="{{select_3.image.url}}"
                             alt="Image Description">
                     </a>
                 </div>
+                {% else %}
+                <div class="swiper-slide">
+                    <a class="js-swiper-thumb-progress swiper-thumb-progress-avatar" href="javascript:;" tabindex="0">
+                        <img class="swiper-thumb-progress-avatar-img" src="{% static 'svg/logos/logo.svg' %}"
+                            alt="Image Description">
+                    </a>
+                </div>
+                {% endif %}
                 <!-- End Slide -->
             </div>
         </div>
@@ -201,10 +307,32 @@
     <div class="row mb-2">
         <div class="col-sm-6 col-md-4 mb-4">
             <!-- Card -->
+            {% if card_a_1 %}
             <div class="card card-bordered shadow-none overflow-hidden">
                 <div class="card-body d-flex align-items-center border-bottom p-0">
                     <div class="w-65 border-end">
-                        <img class="img-fluid" src="{% static '/img/380x400/img3.jpg' %}" alt="Image Description">
+                        <img class="img-fluid" src="{{card_a_1.image.url}}" alt="Image Description">
+                    </div>
+                    <div class="w-35">
+                        <div class="border-bottom">
+                            <img class="img-fluid" src="{{card_a_2.image.url}}" alt="Image Description">
+                        </div>
+                        <img class="img-fluid" src="{{card_a_3.image.url}}" alt="Image Description">
+                    </div>
+                </div>
+
+                <div class="card-footer text-center">
+                    <h3 class="card-title">{{card_a_1.category.title}}</h3>
+                    <p class="card-text text-muted small">شروع از 29.99 تومان</p>
+                    <a class="btn btn-outline-primary btn-sm btn-transition rounded-pill px-6" href="#">مشاهده
+                        همه</a>
+                </div>
+            </div>
+            {%else%}
+            <div class="card card-bordered shadow-none overflow-hidden">
+                <div class="card-body d-flex align-items-center border-bottom p-0">
+                    <div class="w-65 border-end">
+                        <img class="img-fluid" src="{% static '/img/380x400/intelandamd.jpeg' %}" alt="Image Description">
                     </div>
                     <div class="w-35">
                         <div class="border-bottom">
@@ -221,6 +349,7 @@
                         همه</a>
                 </div>
             </div>
+            {%endif%}
             <!-- End Card -->
         </div>
         <!-- End Col -->
