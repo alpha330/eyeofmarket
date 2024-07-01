@@ -12,31 +12,35 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 # ADD BY ALIMAHMOODI
-from decouple import config
 from datetime import timedelta
+from decouple import config
+import environ
+import os
+
+# Initialize environment variables
+env = environ.Env(
+    # Set default values and casting
+    DEBUG=(bool, True)
+)
+# Read .env file
+ENV_CONF = config("ENV_CONF",default='envs/dev/.env.sample')
+environ.Env.read_env(os.path.join(os.path.dirname(os.path.dirname(__file__)), ENV_CONF))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="test")
-
+SECRET_KEY = env("SECRET_KEY", default="test")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", cast=bool, default=True)
+DEBUG = env("DEBUG", cast=bool, default=True)
 
-
-ALLOWED_HOSTS = []
-config("ALLOWED_HOSTS", cast=lambda v: [
-       item.strip() for item in v.split(",")], default="*")
-
+ALLOWED_HOSTS = env("ALLOWED_HOSTS", cast=lambda v: [item.strip() for item in v.split(",")], default=["*"])
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -89,25 +93,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config("PGDB_NAME", default="postgres"),
-        'USER': config("PGDB_USER", default="postgres"),
-        'PASSWORD': config("PGDB_PASSWORD", default='postgres'),
-        'HOST': config("PGDB_HOST", default="DB"),
-        'PORT': config("PGDB_PORT", cast=int, default=5432),
+        'NAME': env("PGDB_NAME", default="postgres"),
+        'USER': env("PGDB_USER", default="postgres"),
+        'PASSWORD': env("PGDB_PASSWORD", default='postgres'),
+        'HOST': env("PGDB_HOST", default="DB"),
+        'PORT': env("PGDB_PORT", cast=int, default=5432),
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -123,22 +123,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = config("TIME_ZONE", default="UTC")
-
+TIME_ZONE = env("TIME_ZONE", default="UTC")
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = 'static/'
 MEDIA_URL = 'media/'
 
@@ -148,21 +141,21 @@ MEDIA_ROOT = BASE_DIR / "media"
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
-# EMAIL SERVER CONFIG
+
+# Email server configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config("EMAIL_HOST", default="alimahmoodi.net")
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=False)
-EMAIL_PORT = config("EMAIL_PORT", cast=int, default=465)
-EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=True)
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="admin@alimahmoodi.net")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="123qwe!@#")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp4dev")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", cast=bool, default=False)
+EMAIL_PORT = env("EMAIL_PORT", cast=int, default=25)
+EMAIL_USE_SSL = env("EMAIL_USE_SSL", cast=bool, default=False)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-SHOW_DEBUGGER_TOOLBAR = config(
-    "SHOW_DEBUGGER_TOOLBAR", cast=bool, default=False)
+
+SHOW_DEBUGGER_TOOLBAR = env("SHOW_DEBUGGER_TOOLBAR", cast=bool, default=False)
 # Debugger toolbar config
 if SHOW_DEBUGGER_TOOLBAR:
     INSTALLED_APPS += [
@@ -171,31 +164,31 @@ if SHOW_DEBUGGER_TOOLBAR:
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
-    import socket  # only if you haven't already imported this
+    import socket
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [
-        ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2","*"]
+    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2", "*"]
 
-# OVERDRIVE USER MODEL BY ACCOUNTS APP
+# Override user model by accounts app
 AUTH_USER_MODEL = "accounts.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-# REDIS CONETCTION FOR CELERY
+# Redis connection for Celery
 CELERY_BROKER_URL = 'redis://redis-emarket:6379/1'
 
-# REDIS CACHING SERVER CONFIG ---> DOCKER CONTAINER REDIS
+# Redis caching server config
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": 'redis://redis-emarket:6379/2',
-        "TIMEOUT":300,
+        "TIMEOUT": 300,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
 
+# JWT configuration
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=48),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -223,32 +216,26 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
-    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
-    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
-    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
-    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
-    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework.simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework.simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework.simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework.simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework.simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-
+# REST framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 
-# CK EDITOR FOR BETTER WRITTINH EXPERIENCE
-
+# CKEditor configuration
 CKEDITOR_UPLOAD_PATH = "uploads/"
-
-# CKEDITOR CALL FILENAME FOR UPLOADED FILES
-
 CKEDITOR_FILENAME_GENERATOR = 'utils.get_filename'
-
 CKEDITOR_CONFIGS = {
     'default': {
         'skin': 'moono',
-        # 'skin': 'office2013',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']
         ],
@@ -256,19 +243,12 @@ CKEDITOR_CONFIGS = {
             {'name': 'document', 'items': ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']},
             {'name': 'clipboard', 'items': ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
             {'name': 'editing', 'items': ['Find', 'Replace', '-', 'SelectAll']},
-            {'name': 'forms',
-             'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
-                       'HiddenField']},
+            {'name': 'forms', 'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField']},
             '/',
-            {'name': 'basicstyles',
-             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']},
-            {'name': 'paragraph',
-             'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-',
-                       'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl',
-                       'Language']},
+            {'name': 'basicstyles', 'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']},
+            {'name': 'paragraph', 'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language']},
             {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
-            {'name': 'insert',
-             'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
+            {'name': 'insert', 'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
             '/',
             {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
             {'name': 'colors', 'items': ['TextColor', 'BGColor']},
@@ -276,30 +256,19 @@ CKEDITOR_CONFIGS = {
             {'name': 'about', 'items': ['About']},
             '/',  # put this to force next toolbar on new line
             {'name': 'yourcustomtools', 'items': [
-                # put the name of your editor.ui.addButton here
                 'Preview',
                 'Maximize',
-
             ]},
         ],
-        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
-        # 'height': 291,
-        # 'width': '100%',
-        # 'filebrowserWindowHeight': 725,
-        # 'filebrowserWindowWidth': 940,
-        # 'toolbarCanCollapse': True,
-        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'toolbar': 'YourCustomToolbarConfig',
         'tabSpaces': 4,
         'extraPlugins': ','.join([
-            'uploadimage', # the upload image feature
-            # your extra plugins here
+            'uploadimage',
             'div',
             'autolink',
             'autoembed',
             'embedsemantic',
             'autogrow',
-            # 'devtools',
             'widget',
             'lineutils',
             'clipboard',
@@ -310,14 +279,14 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-# payment gateway settings
-MERCHANT_ID = config("MERCHANT_ID",default="4ced0a1e-4ad8-4309-9668-3ea3ae8e8897")
-SANDBOX_MODE = config("SANDBOX_MODE", cast=bool, default=True)
+# Payment gateway settings
+MERCHANT_ID = env("MERCHANT_ID", default="4ced0a1e-4ad8-4309-9668-3ea3ae8e8897")
+SANDBOX_MODE = env("SANDBOX_MODE", cast=bool, default=True)
 
-# parspay sandbox
-PARSPAY_API_KEY = config("PARSPAY_API_KEY",default="00000000aaaabbbbcccc000000000000")
+# ParsPay sandbox
+PARSPAY_API_KEY = env("PARSPAY_API_KEY", default="00000000aaaabbbbcccc000000000000")
 
+# Google reCAPTCHA settings
 GOOGLE_RECAPTCHA_SITE_KEY = '6Le_xgEqAAAAAE9R3QGLKCfmr-cPFAQlgaELjot7' 
 GOOGLE_RECAPTCHA_SECRET_KEY = '6Le_xgEqAAAAACt4hDyAHJnQH4QeXEjWQbpbRKz0'
 SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
-

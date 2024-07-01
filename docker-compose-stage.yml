@@ -41,6 +41,7 @@ services:
         - "8000:8000"
       environment:
         - DEBUG=True
+        - ENV_CONF=envs/stage/.env.sample
       restart: always
       depends_on:
        - DB

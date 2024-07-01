@@ -1,7 +1,7 @@
 {% extends "mail_templated/base.tpl" %}
 
 {% block subject %}
-<h2>عضویت شما با ایمیل {{}} در خبر نامه سایت</h2>
+<h2>عضویت شما با ایمیل {{email}} در خبر نامه سایت</h2>
 {% endblock %}
 
 {% block html %}

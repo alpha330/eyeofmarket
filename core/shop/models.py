@@ -32,6 +32,9 @@ class ProductCategoryModel(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
+        
+    def get_cheapest_product(self):
+        return ProductModel.objects.filter(category=self).order_by('price').first()
 
 
 # Create your models here.

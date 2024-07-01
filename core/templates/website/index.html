@@ -322,8 +322,10 @@
                 </div>
 
                 <div class="card-footer text-center">
-                    <h3 class="card-title">{{card_a_1.category.title}}</h3>
-                    <p class="card-text text-muted small">شروع از 29.99 تومان</p>
+                    {% for cat in card_a_1.category.all %}
+                    <h3 class="card-title">{{cat.title}}</h3>
+                    <p class="card-text text-muted small formatted-price">شروع از  {{cat.get_cheapest_product.price}}</p>
+                    {% endfor %}
                     <a class="btn btn-outline-primary btn-sm btn-transition rounded-pill px-6" href="#">مشاهده
                         همه</a>
                 </div>
